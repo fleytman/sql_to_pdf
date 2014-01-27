@@ -1,20 +1,30 @@
 # -*- coding: utf-8 -*-
 
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 import gtk
 import mysql.connector
+
+import sys
+import locale
+
 
 def on_convert_pressed(calcbutton, adress_entry, login_entry, password_entry):
     adress = adress_entry.get_text()
     login = login_entry.get_text()
     password = password_entry.get_text()
     
-    connect__to_server(adress, login, password)
+    data = connect__to_server(adress, login, password)
+    convert_to_pdf(data)
     print "do"
 
 def main():
     window = gtk.Window()
     window.set_default_size(400,400)
     window.set_title(u"sql_to_dpf")
+
 
     mainbox = gtk.VBox()
     window.add(mainbox)
@@ -61,16 +71,18 @@ def main():
     window.show_all()
     gtk.main()
 
-def connect__to_server(adress, login, password_db): #Данная функция соединяется с сервером, уведомляет об успшном соединение
+def connect__to_server(adress, login, password_db): #Данная функция соединяется с сервером, уведомляет об успешном соединение
 	from mysql.connector import errorcode
-	
+	if sys.stdin.encoding: encoding = sys.stdin.encoding
+	else: encoding = locale.getdefaultlocale()[1]
 	try:
 		cnx = mysql.connector.connect(user=login, password=password_db, host=adress, database='test')
 		cursor = cnx.cursor()
 		query = ('SELECT * FROM `city` ORDER BY `name` DESC')
 		cursor.execute(query)
+		data = []
 		for name in cursor:
-			data = []
+			
 			i =0
 			k = len(name)
 			#~ string=""
@@ -78,7 +90,6 @@ def connect__to_server(adress, login, password_db): #Данная функция
 			spisok=[]
 			while i < k:
 				#~ string+= unicode(name[i])
-				
 				spisok.append(name[i])
 				i+=1
 				
@@ -96,14 +107,17 @@ def connect__to_server(adress, login, password_db): #Данная функция
 	else:
 		cursor.close()
 		cnx.close()
+	return data
+	
+def convert_to_pdf(data): #данная функция превращает данные в pdf
+	doc = SimpleDocTemplate("converted.pdf", pagesize=letter)
+	# container for the 'Flowable' objects
+	elements = []
+	t=Table(data)
+	elements.append(t)
+	# write the document to disk
+	doc.build(elements)
 
-	
-	
-def extract_db(): #Данная функция извлекает данные из базы данных
-	pass
-	
-def convert_to_pdf(): #данная функция превращает данные в pdf
-	pass
 
 if __name__ == "__main__":
 	main()

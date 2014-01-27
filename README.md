@@ -1,7 +1,7 @@
 sql_to_pdf -Программа преобразующая sql таблицы в pdf таблицы
 ==========
 
-Рекомендуемые требования:
+Рекомендуемые требования
 ----------
 
 windows xp-8.1
@@ -16,7 +16,9 @@ Connector/Python - https://dev.mysql.com/downloads/file.php?id=450556
 
 pygtk - http://ftp.gnome.org/pub/gnome/binaries/win32/pygtk/2.24/pygtk-all-in-one-2.24.0.win32-py2.7.msi
 
-
+Примечание
+----------
+Русские символы конвертирются в квадратики. Вечные проблемы питона и кодировок. В данном случае проблема в reportlab, я почитал решения, но не особо понял как к таблицам применить его. 
 
 Пример реализации программы
 http://www.advancedreliablesoftware.com/advanced_sql_to_pdf_table_converter.html
