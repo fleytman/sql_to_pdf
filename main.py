@@ -6,8 +6,10 @@ import mysql.connector
 def on_convert_pressed(calcbutton, adress_entry, login_entry, password_entry):
     adress = adress_entry.get_text()
     login = login_entry.get_text()
-    password = password.get_text()
-
+    password = password_entry.get_text()
+    
+    connect__to_server(adress, login, password)
+    print "do"
 
 def main():
     window = gtk.Window()
@@ -39,6 +41,7 @@ def main():
     password_label = gtk.Label(u"password")
     password_box.pack_start(password_label)
     password_entry = gtk.Entry()
+    password_entry.set_text(u"root")
     password_entry.set_visibility(0) # поле для пароля показывает звёздочки
     password_box.pack_start(password_entry)	
 
@@ -59,7 +62,42 @@ def main():
     gtk.main()
 
 def connect__to_server(adress, login, password_db): #Данная функция соединяется с сервером, уведомляет об успшном соединение
-	cnx = mysql.connector.connect(user=login, password=password_db, host=adress)
+	from mysql.connector import errorcode
+	
+	try:
+		cnx = mysql.connector.connect(user=login, password=password_db, host=adress, database='test')
+		cursor = cnx.cursor()
+		query = ('SELECT * FROM `city` ORDER BY `name` DESC')
+		cursor.execute(query)
+		for name in cursor:
+			data = []
+			i =0
+			k = len(name)
+			#~ string=""
+			
+			spisok=[]
+			while i < k:
+				#~ string+= unicode(name[i])
+				
+				spisok.append(name[i])
+				i+=1
+				
+			#~ print string	
+			data.append(spisok)
+			print data
+			print "\n"
+	except mysql.connector.Error as err:
+		if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+			print("Something is wrong with your user name or password")
+		elif err.errno == errorcode.ER_BAD_DB_ERROR:
+			print("Database does not exists")
+		else:
+			print(err)
+	else:
+		cursor.close()
+		cnx.close()
+
+	
 	
 def extract_db(): #Данная функция извлекает данные из базы данных
 	pass
