@@ -24,7 +24,7 @@ def on_convert_pressed(calcbutton, adress_entry, login_entry, password_entry,db_
     print "do"
 def main():
     window = gtk.Window()
-    window.set_default_size(400,400)
+    window.set_default_size(300,200)
     window.set_title(u"sql_to_dpf")
 
 
@@ -133,6 +133,9 @@ def convert_to_pdf(data): #данная функция превращает да
 	# container for the 'Flowable' objects
 	elements = []
 	t=Table(data)
+	t.setStyle(TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ]))
 	elements.append(t)
 	# write the document to disk
 	doc.build(elements)
