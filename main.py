@@ -6,20 +6,22 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 import gtk
 import mysql.connector
-
+#~ import os
 import sys
 import locale
 
 
-def on_convert_pressed(calcbutton, adress_entry, login_entry, password_entry):
+def on_convert_pressed(calcbutton, adress_entry, login_entry, password_entry,db_entry,query_entry):
     adress = adress_entry.get_text()
     login = login_entry.get_text()
     password = password_entry.get_text()
+    db = db_entry.get_text()
+    query = query_entry.get_text()
     
-    data = connect__to_server(adress, login, password)
+    data = connect__to_server(adress, login, password,db,query)
     convert_to_pdf(data)
+    #~ os.system('converted.pdf')
     print "do"
-
 def main():
     window = gtk.Window()
     window.set_default_size(400,400)
@@ -35,6 +37,10 @@ def main():
     mainbox.pack_start(login_box, expand=False)
     password_box = gtk.HBox()
     mainbox.pack_start(password_box, expand=False)
+    db_box = gtk.HBox()
+    mainbox.pack_start(db_box,expand=False)
+    query_box = gtk.VBox()
+    mainbox.pack_start(query_box,expand=False)
 
     adress_label = gtk.Label(u"adress")
     adress_box.pack_start(adress_label)
@@ -53,7 +59,20 @@ def main():
     password_entry = gtk.Entry()
     password_entry.set_text(u"root")
     password_entry.set_visibility(0) # поле для пароля показывает звёздочки
-    password_box.pack_start(password_entry)	
+    password_box.pack_start(password_entry)
+    
+    db_label = gtk.Label(u"database")
+    db_box.pack_start(db_label)
+    db_entry = gtk.Entry()
+    db_entry.set_text(u"test")
+    db_box.pack_start(db_entry)
+
+    query_label = gtk.Label(u"query sql")   	
+    query_box.pack_start(query_label)
+    query_entry = gtk.Entry()
+    query_entry.set_text(u"SELECT * FROM `city` ORDER BY `name` DESC")
+    query_box.pack_start(query_entry)
+
 
     convert_button = gtk.Button(u"convert")
     mainbox.pack_start(convert_button, expand=False)
@@ -66,19 +85,19 @@ def main():
     #sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
     window.connect("destroy", lambda _: gtk.main_quit())
-    convert_button.connect("clicked", on_convert_pressed, adress_entry, login_entry, password_entry)
+    convert_button.connect("clicked", on_convert_pressed, adress_entry, login_entry, password_entry,db_entry,query_entry)
 
     window.show_all()
     gtk.main()
 
-def connect__to_server(adress, login, password_db): #Данная функция соединяется с сервером, уведомляет об успешном соединение
+def connect__to_server(adress, login, password_db,db,query): #Данная функция соединяется с сервером, уведомляет об успешном соединение
 	from mysql.connector import errorcode
 	if sys.stdin.encoding: encoding = sys.stdin.encoding
 	else: encoding = locale.getdefaultlocale()[1]
 	try:
-		cnx = mysql.connector.connect(user=login, password=password_db, host=adress, database='test')
+		cnx = mysql.connector.connect(user=login, password=password_db, host=adress, database=db)
 		cursor = cnx.cursor()
-		query = ('SELECT * FROM `city` ORDER BY `name` DESC')
+		#~ query = ('SELECT * FROM `city` ORDER BY `name` DESC')
 		cursor.execute(query)
 		data = []
 		for name in cursor:
